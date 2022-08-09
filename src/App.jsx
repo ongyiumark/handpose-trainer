@@ -1,33 +1,68 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
+import {useRef, useState} from 'react'
+
+import * as tf from '@tensorflow/tfjs'
+import * as handpose from '@tensorflow-models/handpose'
+import Webcam from 'react-webcam'
+
 import './App.css'
+import {drawHand} from './utilities.js'
 
 function App() {
-  const [count, setCount] = useState(0)
+  const webcamRef = useRef(null)
+  const canvasRef = useRef(null)
+
+  // States to toggle webcam
+  const [on, setOn] = useState(true)
+  const toggle = () => setOn(prevOn => !prevOn)
+
+  const detect = async (net) => {
+    // Check if data is available
+    if (typeof webcamRef.current !=="undefined" &&
+          webcamRef.current !== null &&
+          webcamRef.current.video.readyState === 4
+    ) {
+      // Get video properties
+      const video = webcamRef.current.video
+      const videoWidth = video.videoWidth
+      const videoHeight = video.videoHeight
+
+      // Set video dimensions
+      webcamRef.current.video.width = videoWidth
+      webcamRef.current.video.height = videoHeight
+
+      // Set canvas dimensions
+      canvasRef.current.width = videoWidth
+      canvasRef.current.height = videoHeight
+
+      // Make detections
+      const hand = await net.estimateHands(video);
+      //console.log(hand)
+
+      // Draw mesh
+      const ctx = canvasRef.current.getContext("2d")
+      drawHand(hand, ctx)
+    }
+  }
+
+  const runHandpose = async () => {
+    const net = await handpose.load()
+    console.log("Handpose model loaded.")
+    setInterval(()=>{
+      detect(net)
+    }, 50)
+  }
+
+  runHandpose()
 
   return (
     <div className="App">
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://reactjs.org" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+      <div className="camera">
+        {on && <Webcam ref={webcamRef} className="camera--main" />}
+        <canvas ref={canvasRef} className="camera--main"/> 
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
+
+
+      <button onClick={toggle}>Toggle Webcam</button>
     </div>
   )
 }
