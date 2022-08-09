@@ -1,14 +1,14 @@
-import {useRef, useState} from 'react'
+import {useRef, useState, createRef} from 'react'
 
 import * as tf from '@tensorflow/tfjs'
 import * as handpose from '@tensorflow-models/handpose'
-import Webcam from 'react-webcam'
+import Camera from './components/Camera.jsx'
 
 import './App.css'
 import {drawHand} from './utilities.js'
 
 function App() {
-  const webcamRef = useRef(null)
+  const cameraRef = createRef()
   const canvasRef = useRef(null)
 
   // States to toggle webcam
@@ -17,18 +17,18 @@ function App() {
 
   const detect = async (net) => {
     // Check if data is available
-    if (typeof webcamRef.current !=="undefined" &&
-          webcamRef.current !== null &&
-          webcamRef.current.video.readyState === 4
+    if (typeof cameraRef.current !=="undefined" &&
+          cameraRef.current !== null &&
+          cameraRef.current.video.readyState === 4
     ) {
       // Get video properties
-      const video = webcamRef.current.video
+      const video = cameraRef.current.video
       const videoWidth = video.videoWidth
       const videoHeight = video.videoHeight
 
       // Set video dimensions
-      webcamRef.current.video.width = videoWidth
-      webcamRef.current.video.height = videoHeight
+      cameraRef.current.video.width = videoWidth
+      cameraRef.current.video.height = videoHeight
 
       // Set canvas dimensions
       canvasRef.current.width = videoWidth
@@ -54,10 +54,11 @@ function App() {
 
   runHandpose()
 
+
   return (
     <div className="App">
       <div className="camera">
-        {on && <Webcam ref={webcamRef} className="camera--main" />}
+        {on && <Camera ref={cameraRef} className="camera--main" />}
         <canvas ref={canvasRef} className="camera--main"/> 
       </div>
 
