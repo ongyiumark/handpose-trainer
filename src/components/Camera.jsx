@@ -4,10 +4,14 @@ import { forwardRef } from 'react'
 const Camera = forwardRef((props, ref) => {
   const width = props.width ? props.width : 640
   const height = props.height ? props.height : 480
+  
+  //console.log(`${width} by ${height}`)
 
   const videoConstraints = {
-    width: width,
-    height: height,
+    video: {
+      width: {exact: width},
+      height: {exact: height}
+    },
     facingMode: "user"
   }
 

@@ -1,3 +1,7 @@
+* {
+  box-sizing: border-box;
+}
+
 #root {
   max-width: 1280px;
   margin: 0 auto;
@@ -8,20 +12,23 @@
 .camera {
   position: relative;
   background-color: aliceblue;
-  width: 640px;
-  height: 480px;
+  max-width: 640px;
+  min-height: 480px;
+  width: 90%;
+  height: 90%;
   border-radius: 10px;
-  margin: 10px;
+
+  padding: 20px 20px 50px 20px;
+  margin: 20px auto 20px auto;
 }
 
 .camera--main {
   position: absolute;
   top: 50%;
   left: 50%;
-  transform: translate(-50%, -50%) scaleX(-1);
+  transform: translate(-50%, -50%);
   z-index: 9;
   width: 90%;
-  height: 90%;
   border-radius: 10px;
 }
 
@@ -37,4 +44,5 @@
   background-color: rgba(0, 0, 0, 0.5);
   padding: 10px 20px;
   border-radius: 10px;
+  margin: 0;
 }
