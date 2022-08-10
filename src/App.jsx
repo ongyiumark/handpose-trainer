@@ -15,6 +15,9 @@ function App() {
   const [on, setOn] = useState(true)
   const toggle = () => setOn(prevOn => !prevOn)
 
+  // States to check if model loaded.
+  const [loaded, setLoaded] = useState(false)
+
   const detect = async (net) => {
     // Check if data is available
     if (typeof cameraRef.current !=="undefined" &&
@@ -47,6 +50,7 @@ function App() {
   const runHandpose = async () => {
     const net = await handpose.load()
     console.log("Handpose model loaded.")
+    setLoaded(true)
     setInterval(()=>{
       detect(net)
     }, 50)
@@ -60,6 +64,7 @@ function App() {
       <div className="camera">
         {on && <Camera ref={cameraRef} className="camera--main" />}
         <canvas ref={canvasRef} className="camera--main"/> 
+        {!loaded && <h1 className="camera--loading">Loading hand pose model...</h1>}
       </div>
 
 
