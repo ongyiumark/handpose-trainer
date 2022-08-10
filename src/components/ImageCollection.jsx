@@ -136,9 +136,12 @@ function ImageCollection(props) {
           onChange={handleChange}
           value={appData.formData.classInput.trim()}
         />
-        <button className="panel--button" onClick={getHandPose}>📁 Download</button>
-        <button className="panel--button" onClick={addImage}>📷</button>
-        <button className="panel--button" onClick={toggleCamera}>🔌</button>
+        <div className='collection--buttons'>
+          <button className="panel--button" onClick={getHandPose}>📁 Download</button>
+          <button className="panel--button" onClick={addImage}>📷</button>
+          <button className="panel--button" onClick={toggleCamera}>🔌</button>
+        </div>
+
         
       </div>
     </div>

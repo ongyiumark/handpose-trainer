@@ -92,7 +92,9 @@
 
 .collection--panel {
   display: flex;
+  flex-direction: column;
   justify-content: space-between;
+  align-items: center;
   max-width: 640px;
   margin: auto;
   padding-inline: 10px;
@@ -104,12 +106,19 @@
 }
 
 .panel--input {
-  margin: 10px auto 10px 0;
-  width: 250px;
+  margin-inline: auto;
+  margin-top: 10px;
+  width: 90%;
   border: none;
   border-radius: 5px;
   padding: 5px 10px;
+}
 
+.collection--buttons {
+  display: flex;
+  justify-content: end;
+  width: 90%;
+  margin-top: 0;
 }
 
 .panel--button {
@@ -197,5 +206,5 @@
 /* Instructions Component */
 .Instructions {
   margin: 10px;
-  
+
 }
