@@ -63,9 +63,7 @@ function App() {
     <div className="App">
       <div className="camera">
         {on && <Camera ref={cameraRef} className="camera--main" />}
-        <canvas ref={canvasRef} className="camera--main"/> 
-  
-        
+        <canvas ref={canvasRef} className="camera--main"/>
         {!loaded && <h1 className="camera--loading">Loading hand pose model...</h1>}
       </div>
 
