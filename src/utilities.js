@@ -1,3 +1,7 @@
+import JSZip from "jszip"
+import { saveAs } from 'file-saver'
+import { v4 as uuidv4 } from 'uuid'
+
 export function drawHand(predictions, ctx) {
   if (predictions.length===0) return
 
@@ -45,3 +49,24 @@ export function drawHand(predictions, ctx) {
     }
   })
 } 
+
+
+export function downloadImages(downloadObj) {
+  const zip = new JSZip()
+  const root = `handpose-images`
+  for (const classifier in downloadObj) {
+    const dataArr = downloadObj[classifier]
+    const folder = zip.folder(`${root}/${classifier}`)
+    for (const data of dataArr) {
+      const {img, hand, id} = data
+      const base64Img = img.substr(img.indexOf(',')+1)
+      const uniqueId = uuidv4()
+      folder.file(`${classifier}-${uniqueId}.jpeg`, base64Img, {base64: true})
+      folder.file(`${classifier}-${uniqueId}.json`, JSON.stringify(hand))
+    }
+  }
+
+  zip.generateAsync({type: "blob"}).then(content => {
+    saveAs(content, `handpose-trainer-${uuidv4()}.zip`);
+  });
+}

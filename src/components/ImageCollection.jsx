@@ -1,30 +1,87 @@
-import {useRef, useState, createRef} from 'react'
+import {useRef, useEffect, createRef, useCallback} from 'react'
 
 import Camera from './Camera.jsx'
 import * as handpose from '@tensorflow-models/handpose'
 import {drawHand} from '../utilities.js'
 
-function ImageCollection() {
+function ImageCollection(props) {
   const cameraRef = createRef()
   const canvasRef = useRef(null)
 
+  const {appData, setAppData, getHandPose} = props
+
+  useEffect(() => {
+    const loadModel = async () => {
+      console.log("Loading handpose model...")
+      const net = await handpose.load()
+      console.log("Handpose model loaded.")
+      setAppData(prevAppData => ({
+        ...prevAppData,
+        loaded: true,
+        net: net
+      }))
+    }
+    loadModel()
+  }, [])
+
   // States to toggle webcam
-  const [on, setOn] = useState(true)
-  const toggle = () => setOn(prevOn => {
+  const toggleCamera = () => setAppData(prevAppData => {
     const ctx = canvasRef.current.getContext("2d")
     const canvas = canvasRef.current
     ctx.clearRect(0, 0, canvas.width, canvas.height)
-    return !prevOn
+
+    return {
+      ...prevAppData,
+      on: !prevAppData.on
+    }
   })
 
-  // States to check if model loaded.
-  const [loaded, setLoaded] = useState(false)
+  // Handle input
+  const handleChange = (event) => {
+    const {name, value, type} = event.target
+    setAppData( prevAppData => ({
+      ...prevAppData,
+      formData: {
+        [name]: value
+      }
+    }))
+  }
+  //console.log(appData.formData.classInput)
+  
+  // Take photo
+  const addImage = useCallback(
+    async () => {
+      if (appData.formData.classInput.length === 0) return
 
+      const imgSrc = cameraRef.current.getScreenshot()
+      const htmlImg = new Image()
+      htmlImg.src = imgSrc
+      const net = await handpose.load()
+      net.estimateHands(htmlImg).then(hand => {
+        //console.log(hand)
+        setAppData( prevAppData => ({
+          ...prevAppData,
+          count: prevAppData.count+1,
+          imageData: [...prevAppData.imageData, {
+            id: prevAppData.count,
+            classifier: prevAppData.formData.classInput,
+            img: imgSrc,
+            hand: hand
+          }]
+        }))
+      })
+    },
+    [cameraRef]
+  ) 
+  //console.log(appData.imageData)
+
+  // Read camera and run handpose model
   const detect = async (net) => {
     // Check if data is available
     if (typeof cameraRef.current !=="undefined" &&
           cameraRef.current !== null &&
-          cameraRef.current.video.readyState === 4
+          cameraRef.current.video.readyState === 4 &&
+          appData.loaded
     ) {
       // Get video properties
       const video = cameraRef.current.video
@@ -41,7 +98,7 @@ function ImageCollection() {
 
       // Make detections
       const hand = await net.estimateHands(video);
-      if (!loaded) setLoaded(true)
+      //if (!appData.loaded) setAppData(prevAppData => ({...prevAppData, loaded: true}))
       //console.log(hand)
 
       // Draw mesh
@@ -50,12 +107,13 @@ function ImageCollection() {
     }
   }
 
+  // Load handpose model and run detect at intervals
   const runHandpose = async () => {
-    const net = await handpose.load()
-    console.log("Handpose model loaded.")
-    setInterval(()=>{
-      detect(net)
-    }, 50)
+    if (appData.net) {
+      setInterval(()=>{
+        detect(appData.net)
+      }, 50)
+    }
   }
 
   runHandpose()
@@ -63,13 +121,23 @@ function ImageCollection() {
   return (
     <div className="ImageCollection">
       <div className="camera">
-        {on && <Camera ref={cameraRef} className="camera--main center" />}
+        {appData.on && <Camera ref={cameraRef} className="camera--main center" />}
         <canvas ref={canvasRef} className="camera--main center"/>
-        {!loaded && <h1 className="camera--loading center">Loading hand pose model...</h1>}
+        {!appData.loaded && <h1 className="camera--loading center">Loading hand pose model...</h1>}
       </div>
       <div className="collection--panel">
-        <button className="panel--button">📷</button>
-        <button onClick={toggle} className="panel--button">🔌</button>
+        <input 
+          name="classInput"
+          className="panel--input" 
+          type="text" 
+          placeholder="Please input a class name." 
+          onChange={handleChange}
+          value={appData.formData.classInput}
+        />
+        <button className="panel--button" onClick={getHandPose}>📁 Download</button>
+        <button className="panel--button" onClick={addImage}>📷</button>
+        <button className="panel--button" onClick={toggleCamera}>🔌</button>
+        
       </div>
     </div>
   )
