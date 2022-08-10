@@ -5,6 +5,7 @@ import * as tf from '@tensorflow/tfjs'
 import ImageCollection from './components/ImageCollection.jsx'
 import Header from './components/Header.jsx'
 import ImageList from './components/ImageList.jsx'
+import Instructions from './components/Instructions.jsx'
 import {downloadImages} from './utilities'
 import './App.css'
 
@@ -24,10 +25,10 @@ function App() {
 
   const sortedImages = {}
   appData.imageData.forEach(data => {
-    const {id, img, classifier, hand} = data
+    const {id, img, classifier, hand, width, height} = data
 
     if (!sortedImages[classifier]) sortedImages[classifier] = []
-    sortedImages[classifier].push({id, img, hand})
+    sortedImages[classifier].push({id, img, hand, width, height})
   })
   //console.log(sortedImages)
 
@@ -50,6 +51,7 @@ function App() {
   return (
     <div className="App">
       <Header />
+      <Instructions />
       <ImageCollection 
         appData={appData}
         setAppData={setAppData} 

@@ -2,7 +2,7 @@ import JSZip from "jszip"
 import { saveAs } from 'file-saver'
 import { v4 as uuidv4 } from 'uuid'
 
-export function drawHand(predictions, ctx) {
+export function drawHand(predictions, ctx, xRatio=1, yRatio=1) {
   if (predictions.length===0) return
 
   predictions.forEach((prediction)=>{
@@ -18,10 +18,10 @@ export function drawHand(predictions, ctx) {
       const [startX, startY] = fingerArr[0]
 
       ctx.beginPath()
-      ctx.moveTo(baseX, baseY)
-      ctx.lineTo(startX, startY)
+      ctx.moveTo(baseX*xRatio, baseY*yRatio)
+      ctx.lineTo(startX*xRatio, startY*yRatio)
       ctx.strokeStyle = "aqua"
-      ctx.lineWidth = 3
+      ctx.lineWidth = xRatio < 1 ? 1 : 2
       ctx.stroke()
 
       for (let i=0; i<fingerArr.length-1; i++) {
@@ -29,10 +29,10 @@ export function drawHand(predictions, ctx) {
         const [x1, y1] = fingerArr[i+1]
         
         ctx.beginPath()
-        ctx.moveTo(x0, y0)
-        ctx.lineTo(x1, y1)
+        ctx.moveTo(x0*xRatio, y0*yRatio)
+        ctx.lineTo(x1*xRatio, y1*yRatio)
         ctx.strokeStyle = "aqua"
-        ctx.lineWidth = 3
+        ctx.lineWidth = xRatio < 1 ? 1 : 2
         ctx.stroke()
       }
     }
@@ -42,7 +42,7 @@ export function drawHand(predictions, ctx) {
       const [x,y] = landmark
       
       ctx.beginPath()
-      ctx.arc(x, y, 5, 0, 3*Math.PI)
+      ctx.arc(x*xRatio, y*yRatio, xRatio < 1 ? 2 : 4, 0, 2*Math.PI)
 
       ctx.fillStyle="red"
       ctx.fill()

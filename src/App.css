@@ -158,12 +158,22 @@
   right: 10px;
   top: 15px;
   padding: 5px 10px;
-
+  z-index: 10;
   background-color: rgba(158, 50, 1, 0.7);
 }
 
 .list--container::-webkit-scrollbar {
   height: 10px;
+}
+
+.list--canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 10px;
+  padding: 10px 5px;
 }
 
 /* Track */
@@ -182,4 +192,10 @@
 }
 .list--container::-webkit-scrollbar-thumb:window-inactive {
   background: rgba(199, 74, 17,0.4); 
+}
+
+/* Instructions Component */
+.Instructions {
+  margin: 10px;
+  
 }

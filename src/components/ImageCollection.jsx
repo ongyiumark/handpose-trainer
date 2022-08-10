@@ -66,7 +66,9 @@ function ImageCollection(props) {
             id: prevAppData.count,
             classifier: prevAppData.formData.classInput,
             img: imgSrc,
-            hand: hand
+            hand: hand,
+            width: htmlImg.width,
+            height: htmlImg.height
           }]
         }))
       })
@@ -132,7 +134,7 @@ function ImageCollection(props) {
           type="text" 
           placeholder="Please input a class name." 
           onChange={handleChange}
-          value={appData.formData.classInput}
+          value={appData.formData.classInput.trim()}
         />
         <button className="panel--button" onClick={getHandPose}>📁 Download</button>
         <button className="panel--button" onClick={addImage}>📷</button>

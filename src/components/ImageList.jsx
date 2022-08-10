@@ -1,5 +1,19 @@
+import { useEffect } from "react"
+import { drawHand } from "../utilities.js"
+
 function ImageList(props) {
   const {images, classifier, setAppData} = props
+
+  useEffect( () => {
+    const allCanvas = document.querySelectorAll(".list--canvas")
+    for (const canvas of allCanvas) {
+      const ctx = canvas.getContext("2d")
+      const hand = JSON.parse(canvas.dataset.hand)
+      const [origWidth, origHeight, currWidth, currHeight] = [canvas.dataset.width, canvas.dataset.height, canvas.width, canvas.height]
+      //console.log(`${origWidth} by ${origHeight} to ${currWidth} by ${currHeight}`)
+      drawHand(hand, ctx, currWidth/origWidth, currHeight/origHeight)
+    }
+  }, [images])
 
   // Delete image
   const deleteImage = (event) => {
@@ -29,6 +43,13 @@ function ImageList(props) {
         className="list--img--delete" 
         onClick={deleteImage}
         data-id={val.id}>X</button>
+      <canvas 
+        className="list--canvas" 
+        data-hand={JSON.stringify(val.hand)} 
+        data-id={val.id}
+        data-width={val.width}
+        data-height={val.height}
+        />
     </div>
     )
   )
